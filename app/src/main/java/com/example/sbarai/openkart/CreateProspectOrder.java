@@ -47,6 +47,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 
 import java.text.SimpleDateFormat;
@@ -155,6 +156,7 @@ public class CreateProspectOrder extends AppCompatActivity
             public void onClick(View view) {
                 try {
                     submitProspectOrder();
+
                 }catch (Exception e){
                     e.printStackTrace();
                     Toast.makeText(thisActivity, "Error: Please check the order details", Toast.LENGTH_SHORT).show();
@@ -192,7 +194,17 @@ public class CreateProspectOrder extends AppCompatActivity
                     finish();
                 }
             });
+
+            //For notifications!
+            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            sendRegistrationToServer(refreshedToken, ref.getKey());
+
         }
+    }
+
+    //Maintaining a mapping of order key and creator's token to send notification when target amount is reached
+    private void sendRegistrationToServer(String refreshedToken, String key) {
+        //TODO: Send data to server to maintain a mapping
     }
 
     private boolean isProspectOrderValid(ProspectOrder prospectOrder) {
