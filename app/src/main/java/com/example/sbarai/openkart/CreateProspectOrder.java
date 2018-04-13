@@ -56,6 +56,7 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.zip.Inflater;
+import java.util.Date;
 
 public class CreateProspectOrder extends AppCompatActivity
     implements OnMapReadyCallback,
@@ -72,13 +73,13 @@ public class CreateProspectOrder extends AppCompatActivity
     private Marker mCurrLocationMarker;
     Location lastLoc;
     TextView orderDateText;
-    long orderDate;
     int mYear, mDate, mMonth;
 
     Button submitButton;
     EditText desiredStore;
     EditText colabRadius;
     EditText targetTotal;
+    Date orderDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,8 +126,12 @@ public class CreateProspectOrder extends AppCompatActivity
                 mYear = mCurrentDate.get(Calendar.YEAR);
                 mMonth = mCurrentDate.get(Calendar.MONTH);
                 mDate = mCurrentDate.get(Calendar.DATE);
-                orderDate = LocalDate.of(mYear,mMonth + 1,mDate).atStartOfDay().atZone(ZoneId.of("America/Los_Angeles")).toInstant().toEpochMilli();
-                orderDateText.setText(LocalDate.of(mYear,mMonth + 1,mDate).toString());
+                orderDate = new Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(orderDate);
+                c.add(Calendar.DATE, 1);
+                orderDate = c.getTime();
+                orderDateText.setText(orderDate.toString());
 
                 DatePickerDialog mDatePicker = new DatePickerDialog(CreateProspectOrder.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -142,8 +147,10 @@ public class CreateProspectOrder extends AppCompatActivity
                         mDate = selectedDay;
                         mMonth = selectedMonth;
                         mYear = selectedYear;
-                        orderDate = LocalDate.of(mYear,mMonth + 1,mDate).atStartOfDay().atZone(ZoneId.of("America/Los_Angeles")).toInstant().toEpochMilli();
-                        orderDateText.setText(LocalDate.of(mYear,mMonth + 1,mDate).toString());
+                        Calendar c = Calendar.getInstance();
+                        c.set(mYear, mMonth - 1, mDate, 0, 0);
+                        orderDate = c.getTime();
+                        orderDateText.setText(orderDate.toString());
                     }
                 }, mYear, mMonth, mDate);
                 mDatePicker.show();
@@ -173,7 +180,7 @@ public class CreateProspectOrder extends AppCompatActivity
         prospectOrder.setDesiredStore(desiredStore.getText().toString());
         prospectOrder.setColabRadius(Float.parseFloat(colabRadius.getText().toString()));
         prospectOrder.setTargetTotal(Float.parseFloat(targetTotal.getText().toString()));
-        prospectOrder.setOrderDate(orderDate);
+        prospectOrder.setOrderDate(orderDate.getTime());
         prospectOrder.setStatus(Constants.ProspectOrder.STATUS_ACTIVE);
         try {
             prospectOrder.setCreatorKey(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -184,6 +191,9 @@ public class CreateProspectOrder extends AppCompatActivity
         }
 
         if (isProspectOrderValid(prospectOrder)){
+            //Shortcut way! Just maintain registration token in order data itself, rather than separate database.
+            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            prospectOrder.setCreatorRegistrationToken(refreshedToken);
             DatabaseReference ref = FirebaseManager.getRefToProspectOrders();
             ref = ref.push();
             new GeoFire(FirebaseManager.getRefToGeofireForProspectOrders()).setLocation(ref.getKey(),new GeoLocation(prospectOrder.getLocLat(),prospectOrder.getLocLon()));
@@ -194,17 +204,7 @@ public class CreateProspectOrder extends AppCompatActivity
                     finish();
                 }
             });
-
-            //For notifications!
-            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-            sendRegistrationToServer(refreshedToken, ref.getKey());
-
         }
-    }
-
-    //Maintaining a mapping of order key and creator's token to send notification when target amount is reached
-    private void sendRegistrationToServer(String refreshedToken, String key) {
-        //TODO: Send data to server to maintain a mapping
     }
 
     private boolean isProspectOrderValid(ProspectOrder prospectOrder) {
@@ -224,7 +224,8 @@ public class CreateProspectOrder extends AppCompatActivity
             Toast.makeText(thisActivity, "Error: Target total cannot be zero", Toast.LENGTH_LONG).show();
             return false;
         }
-        if (prospectOrder.getOrderDate() < LocalDate.now().atStartOfDay().atZone(ZoneId.of("America/Los_Angeles")).toInstant().toEpochMilli()){
+        long currentMillis = System.currentTimeMillis();
+        if (prospectOrder.getOrderDate() < System.currentTimeMillis()){
             Toast.makeText(thisActivity, "Error: Please select current or future date", Toast.LENGTH_LONG).show();
             return false;
         }

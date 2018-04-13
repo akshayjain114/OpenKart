@@ -24,6 +24,7 @@ public class ProspectOrder {
     private float colabRadius;
     private String desiredStore;
     private long orderDate; //Can be easily converted to String from java.time
+    private String creatorRegistrationToken;
     private HashMap<String,Collaborator> collaborators;
 //    private List<Comment> comments;
     private int status;
@@ -31,6 +32,14 @@ public class ProspectOrder {
 
     public String getCreatorKey() {
         return creatorKey;
+    }
+
+    public void setCreatorRegistrationToken(String registrationToken){
+        creatorRegistrationToken = registrationToken;
+    }
+
+    public String getCreatorRegistrationToken(){
+        return creatorRegistrationToken;
     }
 
     public void setCreatorKey(String userKey) {
