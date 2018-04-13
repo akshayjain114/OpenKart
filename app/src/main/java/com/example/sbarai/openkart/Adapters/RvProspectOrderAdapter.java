@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.TimeUnit;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -124,8 +125,9 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
     }
 
     private void setDateToView(long orderDate, TextView orderDateView) {
-        LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(orderDate), ZoneId.systemDefault());
-        int daysToGo = (int) DAYS.between(LocalDateTime.now(), date);
+        long now = System.currentTimeMillis();
+        long diff = now - orderDate;
+        int daysToGo = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
         if (daysToGo < 0)
             orderDateView.setText("overdue");
         else if (daysToGo == 0)

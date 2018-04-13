@@ -47,6 +47,7 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
 
     FloatingActionButton createProspectOrderMenu;
     FloatingActionButton testingButton;
+    FloatingActionButton createSmartOrder;
     View createProspectOrderCard;
     Toolbar toolbar;
     public static FusedLocationProviderClient mFusedLocationClient;
@@ -57,6 +58,7 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
     GeoFire geoFire;
     static List<String> data = Collections.emptyList();
     double fetchRadiusInMiles = 0;
+    boolean smartOrder = false;
     GeoQuery geoQuery;
     IndicatorSeekBar seekBar;
     SmoothProgressBar progressBar;
@@ -180,6 +182,7 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
     private void defineVariables() {
         createProspectOrderMenu = findViewById(R.id.menu_item_1);
         createProspectOrderCard = findViewById(R.id.no_data_found);
+        createSmartOrder = findViewById(R.id.menu_item_3);
         testingButton = findViewById(R.id.menu_item_2);
         mRecyclerView = findViewById(R.id.rv_open_orders);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -195,6 +198,13 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
             }
         });
 
+        createSmartOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openCreateSmartOrderActivity();
+            }
+        });
+
         testingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -204,6 +214,13 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
 
     public void openCreateProspectOrderActivity() {
         startActivity(new Intent(OpenOrders.this, CreateProspectOrder.class));
+    }
+
+    public void openCreateSmartOrderActivity() {
+        smartOrder=true;
+        Intent orderIntent = new Intent(OpenOrders.this, CreateProspectOrder.class);
+        orderIntent.putExtra("smart",smartOrder);
+        startActivity(orderIntent);
     }
 
     public List<ProspectOrder> getData() {
