@@ -2,14 +2,11 @@ package com.example.sbarai.openkart.Utils;
 
 import android.util.Log;
 
-import com.google.api.client.json.Json;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -58,6 +55,7 @@ public class NotificationHelper {
             message.put("notification", notification);
         } catch (JSONException e) {
             e.printStackTrace();
+            Log.e("Exception", e.toString());
             return null;
         }
         return message;
