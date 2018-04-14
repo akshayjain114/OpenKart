@@ -48,6 +48,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 
 import java.text.SimpleDateFormat;
@@ -197,9 +198,13 @@ public class CreateProspectOrder extends AppCompatActivity
             DatabaseReference ref = FirebaseManager.getRefToProspectOrders();
             ref = ref.push();
             new GeoFire(FirebaseManager.getRefToGeofireForProspectOrders()).setLocation(ref.getKey(),new GeoLocation(prospectOrder.getLocLat(),prospectOrder.getLocLon()));
+            final DatabaseReference reference = ref;
             ref.setValue(prospectOrder).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
+                    //Subscribed
+                    //FirebaseMessaging.getInstance().subscribeToTopic(reference.getKey());
+
                     Toast.makeText(thisActivity, "Submitted", Toast.LENGTH_SHORT).show();
                     finish();
                 }

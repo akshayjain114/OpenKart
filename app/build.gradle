@@ -44,6 +44,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:11.8.0'
     compile 'com.github.warkiz.widget:indicatorseekbar:1.2.9' // Seekbar
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
+
     implementation 'com.firebaseui:firebase-ui-auth:3.2.1' //Firebase AuthUI
     compile 'com.google.code.gson:gson:2.8.2'
 }

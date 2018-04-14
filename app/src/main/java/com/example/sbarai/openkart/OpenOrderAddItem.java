@@ -12,6 +12,7 @@ import com.example.sbarai.openkart.Models.CollaborationItem;
 import com.example.sbarai.openkart.Models.Collaborator;
 import com.example.sbarai.openkart.Models.ProspectOrder;
 import com.example.sbarai.openkart.Utils.FirebaseManager;
+import com.example.sbarai.openkart.Utils.NotificationHelper;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -158,35 +159,11 @@ public class OpenOrderAddItem extends AppCompatActivity {
         }
         @Override
         protected String doInBackground(Object... params){
-            Log.i("Akshay", "Started background 0");
             try{
-                Log.i("Akshay", "Part 0");
-                final String apiKey = "AIzaSyBOMWgnamPLh4v2FomC-Z82omz9ACIsHZk";
-                URL url = new URL("https://fcm.googleapis.com/fcm/send");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setDoOutput(true);
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setRequestProperty("Authorization", "key=" + apiKey);
-                conn.setDoOutput(true);
-                JSONObject message = new JSONObject();
-                message.put("to", registrationToken);
-                message.put("priority", "high");
-                Log.i("Akshay", "Part 1");
-                JSONObject notification = new JSONObject();
-                // notification.put("title", title);
-                notification.put("body", "Your cart has reached the target amount!");
-                message.put("data", notification);
-                OutputStream os = conn.getOutputStream();
-                os.write(message.toString().getBytes());
-                os.flush();
-                os.close();
-                Log.i("Akshay", "Part 2");
-                int responseCode = conn.getResponseCode();
-                Log.i("Akshay", "Response code = "+ responseCode);
+                NotificationHelper.sendNotification("OpenKart: Cart Ready", "Your cart has reached the target amount", registrationToken);
             }
             catch (Exception ex){
-                Log.e("Akshay", ex.toString());
+                Log.e("Exception occured", ex.toString());
             }
             return null;
         }
