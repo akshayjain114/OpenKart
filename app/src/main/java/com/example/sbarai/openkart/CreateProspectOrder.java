@@ -56,6 +56,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Date;
 import java.util.zip.Inflater;
 import java.util.Date;
 
@@ -69,12 +70,14 @@ public class CreateProspectOrder extends AppCompatActivity
     GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     Activity thisActivity;
+    Intent orderIntent;
     private LocationRequest mLocationRequest;
     private com.google.android.gms.location.LocationListener locationListener;
     private Marker mCurrLocationMarker;
     Location lastLoc;
     TextView orderDateText;
     int mYear, mDate, mMonth;
+    boolean smartOrder;
 
     Button submitButton;
     EditText desiredStore;
@@ -87,7 +90,8 @@ public class CreateProspectOrder extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_prospect_order);
         thisActivity = this;
-
+        orderIntent = getIntent();
+        smartOrder = orderIntent.getBooleanExtra("smart",false);
         toolbar = findViewById(R.id.appbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
@@ -117,6 +121,10 @@ public class CreateProspectOrder extends AppCompatActivity
         colabRadius = findViewById(R.id.colabRadius);
         targetTotal = findViewById(R.id.targetTotal);
         desiredStore = findViewById(R.id.desiredStore);
+        if (smartOrder)
+            desiredStore.setText("Patel Brothers");
+        else
+            desiredStore.setText("Random");
     }
 
     private void setViewActions() {
