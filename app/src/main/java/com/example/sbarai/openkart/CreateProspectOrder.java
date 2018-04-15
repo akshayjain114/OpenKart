@@ -47,6 +47,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 
 import java.text.SimpleDateFormat;
@@ -56,6 +58,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Date;
 import java.util.zip.Inflater;
+import java.util.Date;
 
 public class CreateProspectOrder extends AppCompatActivity
     implements OnMapReadyCallback,
@@ -169,6 +172,7 @@ public class CreateProspectOrder extends AppCompatActivity
             public void onClick(View view) {
                 try {
                     submitProspectOrder();
+
                 }catch (Exception e){
                     e.printStackTrace();
                     Toast.makeText(thisActivity, "Error: Please check the order details", Toast.LENGTH_SHORT).show();
@@ -196,12 +200,19 @@ public class CreateProspectOrder extends AppCompatActivity
         }
 
         if (isProspectOrderValid(prospectOrder)){
+            //Shortcut way! Just maintain registration token in order data itself, rather than separate database.
+            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            prospectOrder.setCreatorRegistrationToken(refreshedToken);
             DatabaseReference ref = FirebaseManager.getRefToProspectOrders();
             ref = ref.push();
             new GeoFire(FirebaseManager.getRefToGeofireForProspectOrders()).setLocation(ref.getKey(),new GeoLocation(prospectOrder.getLocLat(),prospectOrder.getLocLon()));
+            final DatabaseReference reference = ref;
             ref.setValue(prospectOrder).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
+                    //Subscribed
+                    //FirebaseMessaging.getInstance().subscribeToTopic(reference.getKey());
+
                     Toast.makeText(thisActivity, "Submitted", Toast.LENGTH_SHORT).show();
                     finish();
                 }

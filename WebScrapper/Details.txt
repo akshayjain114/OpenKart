@@ -1,0 +1,8 @@
+#For Development Reference  
+  IDE used : Spider 3.2.4 
+  Python version : Python 3.6.3 :: Anaconda custom (64-bit) 
+  Dependencies :  
+    BeautifulSoup 
+      $ pip install BeautifulSoup4  
+    Requests
+      $ pip install requests  
