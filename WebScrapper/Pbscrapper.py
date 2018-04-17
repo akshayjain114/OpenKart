@@ -7,6 +7,8 @@ Created on Fri Mar 30 00:40:44 2018
 """
 import pandas as pd
 import requests
+import inspect
+import os
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
  
@@ -65,7 +67,7 @@ def fetchdatafromcategory(category_link, category):
     items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink'])
     pagelinks = fetchallpagelinks(category_link)
    # print(pagelinks)
-    print("\n\n\n")
+    # print("\n\n\n")
     it =1;
     
     for link in pagelinks:
@@ -101,7 +103,9 @@ def fetchallitemsfromcategories(category_frame):
     
 ###########_____Driver Code______############## 
 #output file name
-file_name = "/Users/surabhisudame/Documents/pbdata.csv"
+filename = inspect.getframeinfo(inspect.currentframe()).filename
+path = os.path.dirname(os.path.abspath(filename))
+file_name = path + "/pbdata.csv"
 page = requests.get("http://store.patelbros.com/")
 soup = BeautifulSoup(page.content, 'html.parser')
 # scrapping categories
@@ -109,8 +113,7 @@ category_frame = findcategorylist(soup)
 finalitems = fetchallitemsfromcategories(category_frame)
 #finalitems.dtypes
 finalitems.to_csv(file_name, sep=',', encoding='utf-8', index=False)
-
-
+for p in finalitems: print p
 
 
 
