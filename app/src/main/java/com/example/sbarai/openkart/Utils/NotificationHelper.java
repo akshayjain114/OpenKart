@@ -40,7 +40,6 @@ public class NotificationHelper {
             e.printStackTrace();
             Log.e("Exception", e.toString());
         }
-
     }
 
     public static JSONObject buildNotification(String title, String body, String deviceToken){
