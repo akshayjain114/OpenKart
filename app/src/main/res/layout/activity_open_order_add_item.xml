@@ -20,6 +20,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <AutoCompleteTextView
+                android:id="@+id/item_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@drawable/border_edittext"
+                android:hint="Start typing item Name..." />
+
             <EditText
                 android:id="@+id/itemLink"
                 android:layout_width="match_parent"
@@ -28,13 +36,13 @@
                 android:background="@drawable/border_edittext"
                 android:hint="item link" />
 
-            <EditText
-                android:id="@+id/itemName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:background="@drawable/border_edittext"
-                android:hint="Item name"/>
+            <!--<EditText-->
+                <!--android:id="@+id/itemName"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="8dp"-->
+                <!--android:background="@drawable/border_edittext"-->
+                <!--android:hint="Item name"/>-->
 
             <EditText
                 android:id="@+id/itemRate"

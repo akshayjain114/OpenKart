@@ -30,8 +30,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-import static java.time.temporal.ChronoUnit.DAYS;
+//import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ProspectOrderDetails extends AppCompatActivity {
 
@@ -175,8 +176,9 @@ public class ProspectOrderDetails extends AppCompatActivity {
     }
 
     private void setDateToView(long orderDate, TextView orderDateView) {
-        LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(orderDate), ZoneId.systemDefault());
-        int daysToGo = (int) DAYS.between(LocalDateTime.now(), date);
+        long now = System.currentTimeMillis();
+        long diff = now - orderDate;
+        int daysToGo = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
         if (daysToGo < 0)
             orderDateView.setText("overdue");
         else if (daysToGo == 0)

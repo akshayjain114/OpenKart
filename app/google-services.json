@@ -15,6 +15,46 @@
       },
       "oauth_client": [
         {
+          "client_id": "708002449471-rbdl7rjelkmbc2apt8aef7vjnfgh67dv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sbarai.openkart",
+            "certificate_hash": "a300b6d2edffdece1b15442d9956211ed59095bb"
+          }
+        },
+        {
+          "client_id": "708002449471-f1je8skdjd8qm8h7j9p3vch9i7uccqjg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sbarai.openkart",
+            "certificate_hash": "f2721a3006ee27f954546a9197c35a1a57ffe52a"
+          }
+        },
+        {
+          "client_id": "708002449471-qmiaq4erau74eqmtnnvs1melraqrqrkd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sbarai.openkart",
+            "certificate_hash": "9d7358a16af0824af23c3b02f1a5e2cc0034a67f"
+          }
+        },
+        {
+          "client_id": "708002449471-2kl70jrtt305ps2jqfqmrbrcolk41hb9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sbarai.openkart",
+            "certificate_hash": "a59f699fb33a314b9711929d4bef37c70047d4a4"
+          }
+        },
+        {
+          "client_id": "708002449471-ig69129bf2f1lufgnphdbamm9pnmqp48.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sbarai.openkart",
+            "certificate_hash": "8274d636e1e2399a9fc61c97d26792ff409daccc"
+          }
+        },
+        {
           "client_id": "708002449471-a95boa4emp9a8h0rof0bngth2iuhslsq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

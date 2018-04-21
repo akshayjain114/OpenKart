@@ -33,5 +33,7 @@ public class Constants {
         public static final String PROSPECT_ORDERS = "prospectOrders";
         public static final String GEO_FIRE = "geofire";
         public static final String USERS = "users";
+        public static final String AUTOFILL = "autofill";
+        public static final String CATALOGUE = "catalogue";
     }
 }

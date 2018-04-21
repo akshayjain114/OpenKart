@@ -55,4 +55,14 @@ public class FirebaseManager {
         DatabaseReference ref = getRefToSpecificUser(key);
         return ref.child("name");
     }
+
+    public static DatabaseReference getRefToAutofill(){
+        DatabaseReference ref = getRootRef();
+        return ref.child(Constants.FirebaseManager.AUTOFILL);
+    }
+
+    public static DatabaseReference getRefToCatalogue(){
+        DatabaseReference ref = getRootRef();
+        return ref.child(Constants.FirebaseManager.CATALOGUE);
+    }
 }
