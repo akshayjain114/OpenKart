@@ -209,6 +209,8 @@ public class CreateProspectOrder extends AppCompatActivity
                     finish();
                 }
             });
+            String x = ref.getKey();
+            FirebaseMessaging.getInstance().subscribeToTopic(ref.getKey());
         }
     }
 

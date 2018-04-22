@@ -1,5 +1,6 @@
 package com.example.sbarai.openkart;
 
+import android.arch.lifecycle.ProcessLifecycleOwnerInitializer;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -106,7 +107,7 @@ public class OpenOrderAddItem extends AppCompatActivity {
 
                         if(amountReached >= targetTotal){
                             //Call firebase API to send a notification!
-                            new NotificationTask(order.getCreatorRegistrationToken()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                            new NotificationTask(POid).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             Log.i("Akshay", "Let's see");
                         }
 
@@ -146,10 +147,10 @@ public class OpenOrderAddItem extends AppCompatActivity {
 
     private class NotificationTask extends AsyncTask<Object, Void, String>{
 
-        String registrationToken;
+        String topicId;
 
         NotificationTask(String rt){
-            registrationToken = rt;
+            topicId = rt;
         }
 
         @Override
@@ -160,7 +161,7 @@ public class OpenOrderAddItem extends AppCompatActivity {
         @Override
         protected String doInBackground(Object... params){
             try{
-                NotificationHelper.sendNotification("OpenKart: Cart Ready", "Your cart has reached the target amount", registrationToken);
+                NotificationHelper.sendNotification("OpenKart: Cart Ready", "Your cart has reached the target amount", topicId);
             }
             catch (Exception ex){
                 Log.e("Exception occured", ex.toString());
