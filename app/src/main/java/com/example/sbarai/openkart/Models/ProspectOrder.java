@@ -7,6 +7,7 @@ import com.google.firebase.database.Exclude;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 // TODO : DELETE THIS FILE
@@ -126,6 +127,23 @@ public class ProspectOrder {
         if (collaborators == null)
             collaborators = new HashMap<>();
         collaborators.put(collaborator.getUserId(),collaborator);
+    }
+
+    public void addCollaborators(HashMap<String,Collaborator> mergingCollaborators){
+        if (collaborators == null)
+            collaborators = new HashMap<>();
+        if(mergingCollaborators != null){
+            for(String coll: mergingCollaborators.keySet()) {
+                if(collaborators.containsKey(coll)){
+                    HashMap<String, CollaborationItem> items = mergingCollaborators.get(coll).getCollaborationItems();
+                    for(String item: items.keySet()) {
+                        collaborators.get(coll).addCollaborationItem(items.get(item));
+                    }
+                }
+                else
+                    collaborators.put(coll, mergingCollaborators.get(coll));
+            }
+        }
     }
 
     public void setTargetTotal(float targetTotal) {

@@ -22,6 +22,7 @@ import com.example.sbarai.openkart.Utils.FirebaseManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
@@ -87,6 +88,21 @@ public class ProspectOrderDetails extends AppCompatActivity {
                                 openMapsToALocation(order.getLocation());
                             }
                         });
+                        if(order.getCreatorKey().equals(userId)){
+                            Button b_merge = findViewById(R.id.button_merge);
+                            b_merge.setVisibility(View.VISIBLE);
+                            b_merge.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(ProspectOrderDetails.this, MergerCarts.class);
+                                    Bundle b = new Bundle();
+                                    b.putString("mergingKey", POid);
+                                    intent.putExtras(b);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            });
+                        }
                     }
 
                     @Override
