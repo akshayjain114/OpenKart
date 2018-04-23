@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +40,6 @@ import java.util.List;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
-import static java.time.temporal.ChronoUnit.DAYS;
 
 
 /**
@@ -100,10 +100,29 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ProspectOrder order = dataSnapshot.getValue(ProspectOrder.class);
                 try {
+                    if (order != null) {
+                        FirebaseManager.getRefToUserName(order.getCreatorKey()).addListenerForSingleValueEvent(
+                                new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot!= null && dataSnapshot.getValue()!=null)
+                                            holder.initiatedBy.setText(dataSnapshot.getValue().toString());
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                }
+                        );
+                    }
+                    //holder.initiatedBy.setText(order.getCreatorKey());
                     holder.storeTitle.setText(order.getDesiredStore());
                     setDateToView(order.getOrderDate(),holder.orderDate);
                     setAmounts(holder.targetValue, holder.amountReached, holder.remainingAmount, order);
                     holder.distance.setText(getDistanceFromLocation(order.getLocLat(), order.getLocLon()) + " Miles");
+                    if (order.isSmart())
+                        holder.smartBadge.setVisibility(View.VISIBLE);
                 } catch (Exception e) {
                     Log.d("TAGG", "Exception generated");
                     e.printStackTrace();
@@ -223,6 +242,7 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
         TextView amountReached;
         TextView remainingAmount;
         TextView distance;
+        ImageView smartBadge;
         View rootView;
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -234,6 +254,7 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
             amountReached = itemView.findViewById(R.id.avalue);
             remainingAmount = itemView.findViewById(R.id.rvalue);
             distance = itemView.findViewById(R.id.milesText);
+            smartBadge = itemView.findViewById(R.id.smart_badge);
         }
     }
 }

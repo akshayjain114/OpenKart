@@ -64,6 +64,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:background="@drawable/border_edittext"
+                android:digits="0123456789."
+                android:inputType="numberDecimal"
                 android:hint="Item count" />
 
             <Button

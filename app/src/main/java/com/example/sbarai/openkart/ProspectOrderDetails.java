@@ -62,7 +62,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
 
     private void fillData() {
         final TextView storeName = findViewById(R.id.storeName);
-        TextView initiatedBy = findViewById(R.id.initiated_by);
+        final TextView initiatedBy = findViewById(R.id.initiated_by);
         final TextView orderDate = findViewById(R.id.order_date);
         final TextView targetValue = findViewById(R.id.tvalue);
         final TextView amtReached = findViewById(R.id.avalue);
@@ -72,13 +72,13 @@ public class ProspectOrderDetails extends AppCompatActivity {
         final TextView distanceView = findViewById(R.id.milesText);
         final TextView customLocation = findViewById(R.id.shipping_address);
 
-        setInitiatedBy(initiatedBy);
 
         FirebaseManager.getRefToSpecificProspectOrder(POid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         final ProspectOrder order = dataSnapshot.getValue(ProspectOrder.class);
+                        setInitiatedBy(initiatedBy,order);
                         storeName.setText(order.getDesiredStore());
                         setDateToView(order.getOrderDate(),orderDate);
                         setAmounts(targetValue, amtReached, remainingAmount,
@@ -116,11 +116,12 @@ public class ProspectOrderDetails extends AppCompatActivity {
                 });
     }
 
-    private void setInitiatedBy(final TextView initiatedBy) {
-        FirebaseManager.getRefToUserName(userId).addListenerForSingleValueEvent(
+    private void setInitiatedBy(final TextView initiatedBy,ProspectOrder order) {
+        FirebaseManager.getRefToUserName(order.getCreatorKey().toString()).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot!=null&&dataSnapshot.getValue()!=null)
                         initiatedBy.setText(dataSnapshot.getValue().toString());
                     }
 

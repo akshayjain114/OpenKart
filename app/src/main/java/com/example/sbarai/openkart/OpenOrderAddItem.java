@@ -2,14 +2,17 @@ package com.example.sbarai.openkart;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ProcessLifecycleOwnerInitializer;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.renderscript.Sampler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -48,6 +51,10 @@ public class OpenOrderAddItem extends AppCompatActivity {
     String POid;
     String userId;
     boolean smart;
+    protected View retCurrentFocus()
+    {
+        return this.getCurrentFocus();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +79,7 @@ public class OpenOrderAddItem extends AppCompatActivity {
             }
         });
 
-        if(smart==true) {
+        if(smart) {
 
             final DatabaseReference ref = FirebaseManager.getRefToCatalogue();
             final AutoCompleteTextView atItemName;
@@ -82,6 +89,8 @@ public class OpenOrderAddItem extends AppCompatActivity {
             final ImageView ivItemImg = findViewById(R.id.product_image);
             final EditText etItemRate = findViewById(R.id.itemRate);
             etItemRate.setEnabled(false);
+            etItemLink.setTextColor(Color.BLACK);
+            etItemRate.setTextColor(Color.BLACK);
             ref.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -119,12 +128,14 @@ public class OpenOrderAddItem extends AppCompatActivity {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot suggestionsnapshot : dataSnapshot.getChildren()) {
                                 final CatalogueItem sugg = suggestionsnapshot.getValue(CatalogueItem.class);
-                                if ((sugg.getProductDetails().equals(parent.getItemAtPosition(position)))) {
+                                if (sugg != null && (sugg.getProductDetails().equals(parent.getItemAtPosition(position)))) {
                                     //EditText etItemName1 = findViewById(R.id.itemName);
                                     //etItemName1.setText(sugg.getName());
 
                                     etItemLink.setText(sugg.getProductlink());
                                     etItemRate.setText(sugg.getProductPriceRating());
+                                    EditText etItemCount = findViewById(R.id.itemCount);
+                                    etItemCount.setText("1");
                                     @SuppressLint("StaticFieldLeak")
                                     AddItemImageRetrieverActivity imgrt = new AddItemImageRetrieverActivity() {
                                         @Override
@@ -138,7 +149,7 @@ public class OpenOrderAddItem extends AppCompatActivity {
                                                     @Override
                                                     public void run() {
                                                         ivItemImg.setImageBitmap(bmp);
-                                                        ivItemImg.getLayoutParams().height = 750;
+                                                        ivItemImg.getLayoutParams().height = 500;
                                                         ivItemImg.requestLayout();
                                                     }
                                                 });
@@ -150,6 +161,12 @@ public class OpenOrderAddItem extends AppCompatActivity {
                                         }
                                     };
                                     imgrt.execute(sugg.getProductImg());
+                                    atItemName.clearFocus();
+                                    View view = retCurrentFocus();
+                                    if (view != null) {
+                                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                                    }
 
                                 }
 
