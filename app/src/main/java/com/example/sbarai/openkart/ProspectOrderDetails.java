@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -45,6 +46,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
     View addItem;
     LayoutInflater inflater;
     LinearLayout listOfItems;
+    Boolean smart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
                                 openMapsToALocation(order.getLocation());
                             }
                         });
+                        smart=order.isSmart();
                         if(order.getCreatorKey().equals(userId)){
                             Button b_merge = findViewById(R.id.button_merge);
                             b_merge.setVisibility(View.VISIBLE);
@@ -159,10 +162,11 @@ public class ProspectOrderDetails extends AppCompatActivity {
                 }
             }
         }
-        amountReached.setText(String.valueOf(amtReached));
+        DecimalFormat df = new DecimalFormat("###.##");
+        amountReached.setText(String.valueOf(df.format(amtReached)));
         float remainder = order.getTargetTotal() - amtReached;
         if (remainder < 0) remainder = 0;
-        remainingAmount.setText(String.valueOf(remainder));
+        remainingAmount.setText(String.valueOf(df.format(remainder)));
         totalCollaborators.setText(String.valueOf(totalColaboratorsCount) + " Collaborators");
         totalItems.setText(String.valueOf(totalItemsCount) + " Total items");
     }
@@ -308,6 +312,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(ProspectOrderDetails.this,OpenOrderAddItem.class);
                 intent.putExtra("POid",POid);
+                intent.putExtra("smart",smart);
                 startActivity(intent);
             }
         });
