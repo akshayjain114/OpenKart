@@ -64,7 +64,7 @@ def fetchallpagelinks(category_link):
 def fetchdatafromcategory(category_link, category):
     
    
-    items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink'])
+    items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink', 'ProductImg'])
     pagelinks = fetchallpagelinks(category_link)
    # print(pagelinks)
     # print("\n\n\n")
@@ -79,17 +79,19 @@ def fetchdatafromcategory(category_link, category):
             if isinstance(ele, NavigableString):
                 continue
             else :
+                ProductImageLink = ele.find(class_ = "ProductImage QuickView")
+                imgsrc = ProductImageLink.find('img')["src"]
                 ProductPriceRating = ele.find(class_ = "ProductPriceRating")
                 ProductDetails = ele.find(class_ = "ProductDetails")
                 itemlink = ele.find('a')['href']
-                items.loc[it] = [category, category_link, ProductDetails.get_text().strip(), ProductPriceRating.get_text().strip(), itemlink ] 
+                items.loc[it] = [category, category_link, ProductDetails.get_text().strip(), ProductPriceRating.get_text().strip(), itemlink,imgsrc  ]
                 it = it+1
     return items
     
     
     
 def fetchallitemsfromcategories(category_frame):
-   items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink'])
+   items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink', 'ProductImg'])
    for index, row in category_frame.iterrows():
         category_link = row['link']
         

@@ -6,6 +6,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -233,12 +234,13 @@ public class ProspectOrderDetails extends AppCompatActivity {
             return;
         if (order.getCollaborators() != null){
             for (String collaboratorHashKey : order.getCollaborators().keySet()) {
+                float usrAmt = 0;
                 Collaborator collaborator = order.getCollaborators().get(collaboratorHashKey);
                 View collaboratorView = inflater.inflate(R.layout.prospect_order_collaborator_name, null);
                 TextView collaboratorName = collaboratorView.findViewById(R.id.collaborator_name);
                 setCollaboratorName(collaboratorName, collaboratorHashKey);
+                TextView collaboratorAmount = collaboratorView.findViewById(R.id.collaborator_amt);
                 listOfItems.addView(collaboratorView);
-
                 if (collaborator.getCollaborationItems() != null) {
                     for (String itemHashKey : collaborator.getCollaborationItems().keySet()) {
                         final CollaborationItem item = collaborator.getCollaborationItems().get(itemHashKey);
@@ -254,10 +256,12 @@ public class ProspectOrderDetails extends AppCompatActivity {
                                 startActivity(browserIntent);
                             }
                         });
-
+                        usrAmt += item.getCount()*item.getRatePerUnit();
                         listOfItems.addView(itemView);
                     }
                 }
+
+                collaboratorAmount.setText(Float.toString(usrAmt));
             }
         }
 //        listOfItems.addView(inflater.inflate(R.layout.prospect_order_item_details,null));
