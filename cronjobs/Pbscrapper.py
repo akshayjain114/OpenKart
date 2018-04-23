@@ -11,7 +11,7 @@ import inspect
 import os
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
- 
+import json 
 
 def getele(left): 
     for ele in left.children:
@@ -102,18 +102,22 @@ def fetchallitemsfromcategories(category_frame):
 
     
 ###########_____Driver Code______############## 
-#output file name
-filename = inspect.getframeinfo(inspect.currentframe()).filename
-path = os.path.dirname(os.path.abspath(filename))
-file_name = path + "/pbdata.csv"
-page = requests.get("http://store.patelbros.com/")
-soup = BeautifulSoup(page.content, 'html.parser')
-# scrapping categories
-category_frame = findcategorylist(soup)
-finalitems = fetchallitemsfromcategories(category_frame)
-#finalitems.dtypes
-finalitems.to_csv(file_name, sep=',', encoding='utf-8', index=False)
-for p in finalitems: print p
+def writeOutput(): 
+   #output file name
+   filename = inspect.getframeinfo(inspect.currentframe()).filename
+   path = os.path.dirname(os.path.abspath(filename))
+   file_name = path + "/pbdata.json"
+   page = requests.get("http://store.patelbros.com/")
+   soup = BeautifulSoup(page.content, 'html.parser')
+   # scrapping categories
+   category_frame = findcategorylist(soup)
+   finalitems = fetchallitemsfromcategories(category_frame)
+   #finalitems.dtypes
+   #finalitems.to_csv(file_name, sep=',', encoding='utf-8', index=False)
+   finalitems.to_json(file_name,orient='index')
+   mystr = finalitems.to_json(orient='index')
+   return mystr
+   #for p in finalitems: print p
 
 
 
