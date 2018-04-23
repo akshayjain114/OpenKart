@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -160,10 +161,11 @@ public class ProspectOrderDetails extends AppCompatActivity {
                 }
             }
         }
-        amountReached.setText(String.valueOf(amtReached));
+        DecimalFormat df = new DecimalFormat("###.##");
+        amountReached.setText(String.valueOf(df.format(amtReached)));
         float remainder = order.getTargetTotal() - amtReached;
         if (remainder < 0) remainder = 0;
-        remainingAmount.setText(String.valueOf(remainder));
+        remainingAmount.setText(String.valueOf(df.format(remainder)));
         totalCollaborators.setText(String.valueOf(totalColaboratorsCount) + " Collaborators");
         totalItems.setText(String.valueOf(totalItemsCount) + " Total items");
     }
