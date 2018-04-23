@@ -7,6 +7,7 @@ import com.google.firebase.database.Exclude;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 // TODO : DELETE THIS FILE
@@ -24,13 +25,33 @@ public class ProspectOrder {
     private float colabRadius;
     private String desiredStore;
     private long orderDate; //Can be easily converted to String from java.time
+    private String creatorRegistrationToken;
     private HashMap<String,Collaborator> collaborators;
 //    private List<Comment> comments;
     private int status;
     private float targetTotal;
+    private boolean smart;
+
+
+    public boolean isSmart() {
+        return smart;
+    }
+
+    public void setSmart(boolean smart) {
+        this.smart = smart;
+    }
+
 
     public String getCreatorKey() {
         return creatorKey;
+    }
+
+    public void setCreatorRegistrationToken(String registrationToken){
+        creatorRegistrationToken = registrationToken;
+    }
+
+    public String getCreatorRegistrationToken(){
+        return creatorRegistrationToken;
     }
 
     public void setCreatorKey(String userKey) {
@@ -106,6 +127,23 @@ public class ProspectOrder {
         if (collaborators == null)
             collaborators = new HashMap<>();
         collaborators.put(collaborator.getUserId(),collaborator);
+    }
+
+    public void addCollaborators(HashMap<String,Collaborator> mergingCollaborators){
+        if (collaborators == null)
+            collaborators = new HashMap<>();
+        if(mergingCollaborators != null){
+            for(String coll: mergingCollaborators.keySet()) {
+                if(collaborators.containsKey(coll)){
+                    HashMap<String, CollaborationItem> items = mergingCollaborators.get(coll).getCollaborationItems();
+                    for(String item: items.keySet()) {
+                        collaborators.get(coll).addCollaborationItem(items.get(item));
+                    }
+                }
+                else
+                    collaborators.put(coll, mergingCollaborators.get(coll));
+            }
+        }
     }
 
     public void setTargetTotal(float targetTotal) {

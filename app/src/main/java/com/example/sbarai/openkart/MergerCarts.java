@@ -1,56 +1,59 @@
 package com.example.sbarai.openkart;
 
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+
+        import android.content.Intent;
+        import android.content.pm.PackageManager;
+        import android.location.Location;
+        import android.support.annotation.NonNull;
+        import android.support.annotation.Nullable;
+        import android.support.v4.app.ActivityCompat;
+        import android.support.v4.content.ContextCompat;
+        import android.support.v7.app.AppCompatActivity;
+        import android.os.Bundle;
+        import android.support.v7.widget.LinearLayoutManager;
+        import android.support.v7.widget.RecyclerView;
+        import android.support.v7.widget.Toolbar;
+        import android.util.Log;
+        import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
+        import android.widget.Toast;
 
 import com.example.sbarai.openkart.Adapters.RvProspectOrderAdapter;
-import com.example.sbarai.openkart.Models.Collaborator;
+import com.example.sbarai.openkart.Adapters.RvProspectOrderMergeAdapter;
+import com.example.sbarai.openkart.Adapters.RvProspectOrderMergeAdapter;
 import com.example.sbarai.openkart.Models.ProspectOrder;
-import com.example.sbarai.openkart.Utils.FirebaseManager;
-import com.firebase.geofire.GeoFire;
+        import com.example.sbarai.openkart.Utils.FirebaseManager;
+        import com.firebase.geofire.GeoFire;
 
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.GeoQuery;
-import com.firebase.geofire.GeoQueryEventListener;
-import com.github.clans.fab.FloatingActionButton;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+        import com.firebase.geofire.GeoLocation;
+        import com.firebase.geofire.GeoQuery;
+        import com.firebase.geofire.GeoQueryEventListener;
+        import com.github.clans.fab.FloatingActionButton;
+        import com.google.android.gms.common.ConnectionResult;
+        import com.google.android.gms.common.GooglePlayServicesUtil;
+        import com.google.android.gms.common.api.GoogleApiClient;
+        import com.google.android.gms.location.FusedLocationProviderClient;
+        import com.google.android.gms.location.LocationRequest;
+        import com.google.android.gms.location.LocationServices;
+        import com.google.android.gms.tasks.OnFailureListener;
+        import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.warkiz.widget.IndicatorSeekBar;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+        import java.util.ArrayList;
+        import java.util.Collections;
+        import java.util.List;
 
-import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+        import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
-public class OpenOrders extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
+public class MergerCarts extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
-    FloatingActionButton createProspectOrderMenu;
-    FloatingActionButton testingButton;
     FloatingActionButton createSmartOrder;
     View createProspectOrderCard;
     Toolbar toolbar;
@@ -58,9 +61,9 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
     private LocationRequest mLocationRequest;
     public GoogleApiClient mGoogleApiClient;
     RecyclerView mRecyclerView;
-    private RvProspectOrderAdapter adapter;
+    private RvProspectOrderMergeAdapter adapter;
     GeoFire geoFire;
-    static List<String> data = Collections.emptyList();
+    static List<String> data = new ArrayList<String>();
     double fetchRadiusInMiles = 0;
     boolean smartOrder = false;
     GeoQuery geoQuery;
@@ -68,12 +71,16 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
     SmoothProgressBar progressBar;
     public static Location location;
     private boolean hasDataLoaded = false;
+    Button b_merge;
 
+    //For merging carts
+    String mergingKey;
+    String mergingStoreName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_open_orders);
+        setContentView(R.layout.activity_merger_carts);
 
         toolbar = findViewById(R.id.appbar);
         setSupportActionBar(toolbar);
@@ -81,16 +88,32 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
         toolbar.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         connectGoogleApiClients();
         defineVariables();
-        setFABListeners();
 
-        initVariables();
-        setListeners();
+        Bundle b = getIntent().getExtras();
+        mergingKey = ""; // or other values
+        if(b != null)
+            mergingKey = b.getString("mergingKey");
+
         setRecyclerView();
 //        executeOneTimeLocationListener();
         setRadiusSeekBar();
 //        setRecyclerView();
 
 
+
+        FirebaseManager.getRefToSpecificProspectOrder(mergingKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final ProspectOrder order = dataSnapshot.getValue(ProspectOrder.class);
+                        mergingStoreName = (order.getDesiredStore());
+                            };
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void connectGoogleApiClients() {
@@ -119,17 +142,6 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-    }
-
-
-
-    private void setListeners() {
-        createProspectOrderCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openCreateProspectOrderActivity();
-            }
-        });
     }
 
     private void executeOneTimeLocationListener() {
@@ -167,12 +179,6 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
         });
     }
 
-
-
-    private void initVariables() {
-
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -184,47 +190,10 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
     }
 
     private void defineVariables() {
-        createProspectOrderMenu = findViewById(R.id.menu_item_1);
-        createProspectOrderCard = findViewById(R.id.no_data_found);
-        createSmartOrder = findViewById(R.id.menu_item_3);
-        testingButton = findViewById(R.id.menu_item_2);
-        mRecyclerView = findViewById(R.id.rv_open_orders);
+        mRecyclerView = findViewById(R.id.rv_open_orders2);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         geoFire = new GeoFire(FirebaseManager.getRefToGeofireForProspectOrders());
         progressBar = findViewById(R.id.progress_bar);
-    }
-
-    private void setFABListeners() {
-        createProspectOrderMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openCreateProspectOrderActivity();
-            }
-        });
-
-        createSmartOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openCreateSmartOrderActivity();
-            }
-        });
-
-        testingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
-    }
-
-    public void openCreateProspectOrderActivity() {
-        startActivity(new Intent(OpenOrders.this, CreateProspectOrder.class));
-    }
-
-    public void openCreateSmartOrderActivity() {
-        smartOrder=true;
-        Intent orderIntent = new Intent(OpenOrders.this, CreateProspectOrder.class);
-        orderIntent.putExtra("smart",smartOrder);
-        startActivity(orderIntent);
     }
 
     public List<ProspectOrder> getData() {
@@ -260,20 +229,25 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
             public void onKeyEntered(final String key, GeoLocation location) {
 //                totalKeysEntered++;
                 Log.d("TAGG", "onKeyEntered");
+
                 FirebaseManager.getRefToSpecificProspectOrder(key)
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 final ProspectOrder order = dataSnapshot.getValue(ProspectOrder.class);
-                                if (order != null)
-                                    insertIntoData(key);
-                            }
+                                if(order != null){
+                                    if(!key.equals(mergingKey)&& order.getDesiredStore().equals(mergingStoreName)){
+                                        insertIntoData(key);
+                                    }
+                                }
+                            };
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
 
                             }
                         });
+
             }
 
             @Override
@@ -308,7 +282,7 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
 
     private void insertIntoData(String key) {
 //        data.add(key);
-        adapter.insertIntoData(key);
+        adapter.insertIntoData(key, mergingKey);
     }
 
     public void setRecyclerView() {
@@ -318,7 +292,7 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
 //        }else if (data.size() == 0){
 //            Log.d("TAGG","setRecyclerView - data size: " + data.size());
 //        } else {
-        adapter = new RvProspectOrderAdapter(this, data);
+        adapter = new RvProspectOrderMergeAdapter(this, data);
         adapter.setNoDataFound(findViewById(R.id.no_data_found));
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -413,4 +387,5 @@ public class OpenOrders extends AppCompatActivity implements GoogleApiClient.Con
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d("TAGG","onConnectionFailed");
     }
+
 }

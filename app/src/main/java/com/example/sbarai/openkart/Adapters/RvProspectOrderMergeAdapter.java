@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
@@ -12,9 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sbarai.openkart.MergerCarts;
 import com.example.sbarai.openkart.Models.CollaborationItem;
 import com.example.sbarai.openkart.Models.Collaborator;
 import com.example.sbarai.openkart.Models.ProspectOrder;
@@ -28,6 +32,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -35,26 +41,23 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
-import static java.time.temporal.ChronoUnit.DAYS;
-
-
 /**
- * Created by sbarai on 2/8/18.
+ * Created by aksha on 4/22/2018.
  */
 
-public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrderAdapter.MyViewHolder> {
-
-
+public class RvProspectOrderMergeAdapter extends RecyclerView.Adapter<RvProspectOrderMergeAdapter.MyViewHolder> {
     private LayoutInflater inflater;
     private List<String> data = Collections.EMPTY_LIST;
     private static Context context;
     private View noDataFound;
+    private String _mergingKey;
 
-    public RvProspectOrderAdapter(Context context, List<String> data) {
+    public RvProspectOrderMergeAdapter(Context context, List<String> data) {
         inflater = LayoutInflater.from(context);
         this.context = context;
         if (data.size() == 0)
@@ -69,21 +72,60 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.row_rv_prospect_order, parent, false);
+        View view = inflater.inflate(R.layout.row_rv_prospect_order_merge, parent, false);
         MyViewHolder holder = new MyViewHolder(view);
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(RvProspectOrderMergeAdapter.MyViewHolder holder, final int position) {
         holder.storeTitle.setText("Loading...");
         setContentToHolder(holder, position, 1);
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToOrderDetails(data.get(position));
+                String mergerKey = data.get(position);
+
+                mergeCarts(mergerKey, _mergingKey);
+
+                Toast.makeText(view.getContext(), "Cart has been merged", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void mergeCarts(final String mergerKey, final String mergingKey){
+
+        FirebaseManager.getRefToSpecificProspectOrder(mergerKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(final DataSnapshot dataSnapshotMerger) {
+                        final ProspectOrder mergerOrder = dataSnapshotMerger.getValue(ProspectOrder.class);
+                        FirebaseManager.getRefToSpecificProspectOrder(mergingKey)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshotMerging) {
+                                        final ProspectOrder mergingOrder = dataSnapshotMerging.getValue(ProspectOrder.class);
+                                        if (mergingOrder == null)
+                                            return;
+                                        HashMap<String, Collaborator> mergingCollaborators = mergingOrder.getCollaborators();
+                                        mergerOrder.addCollaborators(mergingCollaborators);
+                                        dataSnapshotMerging.getRef().removeValue();
+                                        dataSnapshotMerger.getRef().setValue(mergerOrder);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
     }
 
     private void goToOrderDetails(String id) {
@@ -92,7 +134,7 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
         context.startActivity(intent);
     }
 
-    public void setContentToHolder(final MyViewHolder holder, final int position, final int attempt) {
+    public void setContentToHolder(final RvProspectOrderMergeAdapter.MyViewHolder holder, final int position, final int attempt) {
         String key = data.get(position);
         DatabaseReference ref = FirebaseManager.getRefToSpecificProspectOrder(key);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -123,6 +165,7 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
                 }
             }
         });
+
     }
 
     private void setDateToView(long orderDate, TextView orderDateView) {
@@ -134,7 +177,7 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
         else if (daysToGo == 0)
             orderDateView.setText("Today");
         else if (daysToGo == 1)
-           orderDateView.setText("Tomorrow");
+            orderDateView.setText("Tomorrow");
         else
             orderDateView.setText("" + daysToGo + " Days left");
     }
@@ -199,7 +242,8 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
         return data.size();
     }
 
-    public void insertIntoData(String key) {
+    public void insertIntoData(String key, String mergingKey) {
+        _mergingKey = mergingKey;
         data.add(key);
         dataSetChanged();
         notifyItemInserted(data.indexOf(key));
@@ -208,8 +252,10 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
 
     public void removeFromData(String key) {
         int index = data.indexOf(key);
-        data.remove(index);
-        notifyItemRemoved(index);
+        if(index >=0 && index < data.size()) {
+            data.remove(index);
+            notifyItemRemoved(index);
+        }
 //        dataSetChanged();
 //        Log.d("TAGG","removed from data, new size" + data.size());
     }
@@ -224,6 +270,7 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
         TextView remainingAmount;
         TextView distance;
         View rootView;
+        TextView tv_merge;
         public MyViewHolder(View itemView) {
             super(itemView);
             storeTitle = itemView.findViewById(R.id.storeName);
@@ -234,6 +281,7 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
             amountReached = itemView.findViewById(R.id.avalue);
             remainingAmount = itemView.findViewById(R.id.rvalue);
             distance = itemView.findViewById(R.id.milesText);
+            tv_merge = itemView.findViewById(R.id.tv_merge);
         }
     }
 }

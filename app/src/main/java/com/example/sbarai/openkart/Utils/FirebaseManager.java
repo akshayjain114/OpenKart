@@ -35,6 +35,13 @@ public class FirebaseManager {
         return ref.child(key);
     }
 
+    public static DatabaseReference getRefToSpecificStoreOrders(String store){
+        DatabaseReference ref = getRefToProspectOrders();
+        //String children = ref.child()
+        return ref;
+        //return ref.child();
+    }
+
     public static DatabaseReference getRefToGeofireForProspectOrders(){
         DatabaseReference ref = getRefToOpenOrders();
         return ref.child(Constants.FirebaseManager.GEO_FIRE);
@@ -54,5 +61,15 @@ public class FirebaseManager {
     public static DatabaseReference getRefToUserName(String key){
         DatabaseReference ref = getRefToSpecificUser(key);
         return ref.child("name");
+    }
+
+    public static DatabaseReference getRefToAutofill(){
+        DatabaseReference ref = getRootRef();
+        return ref.child(Constants.FirebaseManager.AUTOFILL);
+    }
+
+    public static DatabaseReference getRefToCatalogue(){
+        DatabaseReference ref = getRootRef();
+        return ref.child(Constants.FirebaseManager.CATALOGUE);
     }
 }

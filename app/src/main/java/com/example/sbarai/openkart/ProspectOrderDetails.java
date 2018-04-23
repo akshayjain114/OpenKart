@@ -22,16 +22,19 @@ import com.example.sbarai.openkart.Utils.FirebaseManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-import static java.time.temporal.ChronoUnit.DAYS;
+//import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ProspectOrderDetails extends AppCompatActivity {
 
@@ -42,6 +45,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
     View addItem;
     LayoutInflater inflater;
     LinearLayout listOfItems;
+    Boolean smart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +90,22 @@ public class ProspectOrderDetails extends AppCompatActivity {
                                 openMapsToALocation(order.getLocation());
                             }
                         });
+                        smart=order.isSmart();
+                        if(order.getCreatorKey().equals(userId)){
+                            Button b_merge = findViewById(R.id.button_merge);
+                            b_merge.setVisibility(View.VISIBLE);
+                            b_merge.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(ProspectOrderDetails.this, MergerCarts.class);
+                                    Bundle b = new Bundle();
+                                    b.putString("mergingKey", POid);
+                                    intent.putExtras(b);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            });
+                        }
                     }
 
                     @Override
@@ -141,10 +161,11 @@ public class ProspectOrderDetails extends AppCompatActivity {
                 }
             }
         }
-        amountReached.setText(String.valueOf(amtReached));
+        DecimalFormat df = new DecimalFormat("###.##");
+        amountReached.setText(String.valueOf(df.format(amtReached)));
         float remainder = order.getTargetTotal() - amtReached;
         if (remainder < 0) remainder = 0;
-        remainingAmount.setText(String.valueOf(remainder));
+        remainingAmount.setText(String.valueOf(df.format(remainder)));
         totalCollaborators.setText(String.valueOf(totalColaboratorsCount) + " Collaborators");
         totalItems.setText(String.valueOf(totalItemsCount) + " Total items");
     }
@@ -175,8 +196,9 @@ public class ProspectOrderDetails extends AppCompatActivity {
     }
 
     private void setDateToView(long orderDate, TextView orderDateView) {
-        LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(orderDate), ZoneId.systemDefault());
-        int daysToGo = (int) DAYS.between(LocalDateTime.now(), date);
+        long now = System.currentTimeMillis();
+        long diff = now - orderDate;
+        int daysToGo = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
         if (daysToGo < 0)
             orderDateView.setText("overdue");
         else if (daysToGo == 0)
@@ -286,6 +308,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(ProspectOrderDetails.this,OpenOrderAddItem.class);
                 intent.putExtra("POid",POid);
+                intent.putExtra("smart",smart);
                 startActivity(intent);
             }
         });

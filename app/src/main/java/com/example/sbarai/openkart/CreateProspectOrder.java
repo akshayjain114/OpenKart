@@ -47,6 +47,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 
 import java.text.SimpleDateFormat;
@@ -54,7 +56,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Date;
 import java.util.zip.Inflater;
+import java.util.Date;
 
 public class CreateProspectOrder extends AppCompatActivity
     implements OnMapReadyCallback,
@@ -66,25 +70,28 @@ public class CreateProspectOrder extends AppCompatActivity
     GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     Activity thisActivity;
+    Intent orderIntent;
     private LocationRequest mLocationRequest;
     private com.google.android.gms.location.LocationListener locationListener;
     private Marker mCurrLocationMarker;
     Location lastLoc;
     TextView orderDateText;
-    long orderDate;
     int mYear, mDate, mMonth;
+    boolean smartOrder;
 
     Button submitButton;
     EditText desiredStore;
     EditText colabRadius;
     EditText targetTotal;
+    Date orderDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_prospect_order);
         thisActivity = this;
-
+        orderIntent = getIntent();
+        smartOrder = orderIntent.getBooleanExtra("smart",false);
         toolbar = findViewById(R.id.appbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
@@ -114,6 +121,10 @@ public class CreateProspectOrder extends AppCompatActivity
         colabRadius = findViewById(R.id.colabRadius);
         targetTotal = findViewById(R.id.targetTotal);
         desiredStore = findViewById(R.id.desiredStore);
+        if (smartOrder)
+            desiredStore.setText("Patel Brothers");
+        else
+            desiredStore.setText("");
     }
 
     private void setViewActions() {
@@ -124,8 +135,12 @@ public class CreateProspectOrder extends AppCompatActivity
                 mYear = mCurrentDate.get(Calendar.YEAR);
                 mMonth = mCurrentDate.get(Calendar.MONTH);
                 mDate = mCurrentDate.get(Calendar.DATE);
-                orderDate = LocalDate.of(mYear,mMonth + 1,mDate).atStartOfDay().atZone(ZoneId.of("America/Los_Angeles")).toInstant().toEpochMilli();
-                orderDateText.setText(LocalDate.of(mYear,mMonth + 1,mDate).toString());
+                orderDate = new Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(orderDate);
+                c.add(Calendar.DATE, 1);
+                orderDate = c.getTime();
+                orderDateText.setText(orderDate.toString());
 
                 DatePickerDialog mDatePicker = new DatePickerDialog(CreateProspectOrder.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -141,8 +156,10 @@ public class CreateProspectOrder extends AppCompatActivity
                         mDate = selectedDay;
                         mMonth = selectedMonth;
                         mYear = selectedYear;
-                        orderDate = LocalDate.of(mYear,mMonth + 1,mDate).atStartOfDay().atZone(ZoneId.of("America/Los_Angeles")).toInstant().toEpochMilli();
-                        orderDateText.setText(LocalDate.of(mYear,mMonth + 1,mDate).toString());
+                        Calendar c = Calendar.getInstance();
+                        c.set(mYear, mMonth - 1, mDate, 0, 0);
+                        orderDate = c.getTime();
+                        orderDateText.setText(orderDate.toString());
                     }
                 }, mYear, mMonth, mDate);
                 mDatePicker.show();
@@ -155,6 +172,7 @@ public class CreateProspectOrder extends AppCompatActivity
             public void onClick(View view) {
                 try {
                     submitProspectOrder();
+
                 }catch (Exception e){
                     e.printStackTrace();
                     Toast.makeText(thisActivity, "Error: Please check the order details", Toast.LENGTH_SHORT).show();
@@ -171,7 +189,12 @@ public class CreateProspectOrder extends AppCompatActivity
         prospectOrder.setDesiredStore(desiredStore.getText().toString());
         prospectOrder.setColabRadius(Float.parseFloat(colabRadius.getText().toString()));
         prospectOrder.setTargetTotal(Float.parseFloat(targetTotal.getText().toString()));
-        prospectOrder.setOrderDate(orderDate);
+        prospectOrder.setOrderDate(orderDate.getTime());
+        if(smartOrder)
+            prospectOrder.setSmart(true);
+        else
+            prospectOrder.setSmart(false);
+
         prospectOrder.setStatus(Constants.ProspectOrder.STATUS_ACTIVE);
         try {
             prospectOrder.setCreatorKey(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -182,16 +205,25 @@ public class CreateProspectOrder extends AppCompatActivity
         }
 
         if (isProspectOrderValid(prospectOrder)){
+            //Shortcut way! Just maintain registration token in order data itself, rather than separate database.
+            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            prospectOrder.setCreatorRegistrationToken(refreshedToken);
             DatabaseReference ref = FirebaseManager.getRefToProspectOrders();
             ref = ref.push();
             new GeoFire(FirebaseManager.getRefToGeofireForProspectOrders()).setLocation(ref.getKey(),new GeoLocation(prospectOrder.getLocLat(),prospectOrder.getLocLon()));
+            final DatabaseReference reference = ref;
             ref.setValue(prospectOrder).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
+                    //Subscribed
+                    //FirebaseMessaging.getInstance().subscribeToTopic(reference.getKey());
+
                     Toast.makeText(thisActivity, "Submitted", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             });
+            String x = ref.getKey();
+            FirebaseMessaging.getInstance().subscribeToTopic(ref.getKey());
         }
     }
 
@@ -212,7 +244,8 @@ public class CreateProspectOrder extends AppCompatActivity
             Toast.makeText(thisActivity, "Error: Target total cannot be zero", Toast.LENGTH_LONG).show();
             return false;
         }
-        if (prospectOrder.getOrderDate() < LocalDate.now().atStartOfDay().atZone(ZoneId.of("America/Los_Angeles")).toInstant().toEpochMilli()){
+        long currentMillis = System.currentTimeMillis();
+        if (prospectOrder.getOrderDate() < System.currentTimeMillis()){
             Toast.makeText(thisActivity, "Error: Please select current or future date", Toast.LENGTH_LONG).show();
             return false;
         }

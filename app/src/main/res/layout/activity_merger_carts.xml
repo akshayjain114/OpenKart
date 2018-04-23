@@ -6,11 +6,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.sbarai.openkart.OpenOrders">
+    tools:context="com.example.sbarai.openkart.MergerCarts">
 
     <include
         android:id="@+id/appbar"
-        layout="@layout/appbar_openorders" />
+        layout="@layout/appbar_mergercarts" />
 
     <ImageView
         android:layout_width="match_parent"
@@ -72,7 +72,7 @@
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_open_orders"
+            android:id="@+id/rv_open_orders2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -156,100 +156,6 @@
         app:spb_speed="2.0"
         app:spb_stroke_separator_length="8dp"
         app:spb_stroke_width="2dp" />
-
-    <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom_bar"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        fab:menu_animationDelayPerItem="50"
-        fab:menu_backgroundColor="@android:color/transparent"
-        fab:menu_buttonSpacing="0dp"
-        fab:menu_colorNormal="@color/colorAccent"
-        fab:menu_colorPressed="@color/colorAccent"
-        fab:menu_colorRipple="#99FFFFFF"
-        fab:menu_fab_label=""
-        fab:menu_fab_size="normal"
-        fab:menu_icon="@drawable/fab_add"
-        fab:menu_labels_colorNormal="#aa000000"
-        fab:menu_labels_colorPressed="#444444"
-        fab:menu_labels_colorRipple="#66FFFFFF"
-        fab:menu_labels_cornerRadius="3dp"
-        fab:menu_labels_ellipsize="none"
-        fab:menu_labels_hideAnimation="@anim/fab_slide_out_to_right"
-        fab:menu_labels_margin="0dp"
-        fab:menu_labels_maxLines="-1"
-        fab:menu_labels_padding="8dp"
-        fab:menu_labels_paddingBottom="4dp"
-        fab:menu_labels_paddingLeft="8dp"
-        fab:menu_labels_paddingRight="8dp"
-        fab:menu_labels_paddingTop="4dp"
-        fab:menu_labels_position="left"
-        fab:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
-        fab:menu_labels_showShadow="true"
-        fab:menu_labels_singleLine="false"
-        fab:menu_labels_textColor="#FFFFFF"
-        fab:menu_labels_textSize="14sp"
-        fab:menu_openDirection="up"
-        fab:menu_shadowColor="#66000000"
-        fab:menu_shadowRadius="4dp"
-        fab:menu_shadowXOffset="1dp"
-        fab:menu_shadowYOffset="3dp"
-        fab:menu_showShadow="true">
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/menu_item_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/fab_add"
-            app:fab_colorNormal="@color/colorAccent"
-            app:fab_colorPressed="@color/colorAccent"
-            app:fab_colorRipple="#99FFFFFF"
-            app:fab_shadowColor="#66000000"
-            app:fab_shadowRadius="4dp"
-            app:fab_shadowXOffset="1dp"
-            app:fab_shadowYOffset="3dp"
-            app:fab_showShadow="true"
-            fab:fab_label="Add a prospect order"
-            fab:fab_size="mini" />
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/menu_item_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/fab_add"
-            app:fab_colorNormal="@color/colorAccent"
-            app:fab_colorPressed="@color/colorAccent"
-            app:fab_colorRipple="#99FFFFFF"
-            app:fab_shadowColor="#66000000"
-            app:fab_shadowRadius="4dp"
-            app:fab_shadowXOffset="1dp"
-            app:fab_shadowYOffset="3dp"
-            app:fab_showShadow="true"
-            fab:fab_label="My prospect orders"
-            fab:fab_size="mini" />
-
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/menu_item_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/fab_add"
-            app:fab_colorNormal="@color/colorAccent"
-            app:fab_colorPressed="@color/colorAccent"
-            app:fab_colorRipple="#99FFFFFF"
-            app:fab_shadowColor="#66000000"
-            app:fab_shadowRadius="4dp"
-            app:fab_shadowXOffset="1dp"
-            app:fab_shadowYOffset="3dp"
-            app:fab_showShadow="true"
-            fab:fab_label="Add a smart Order"
-            fab:fab_size="mini" />
-
-    </com.github.clans.fab.FloatingActionMenu>
 
 
 </RelativeLayout>

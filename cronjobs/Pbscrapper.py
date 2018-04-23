@@ -11,7 +11,7 @@ import inspect
 import os
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
- 
+import json 
 
 def getele(left): 
     for ele in left.children:
@@ -64,9 +64,10 @@ def fetchallpagelinks(category_link):
 def fetchdatafromcategory(category_link, category):
     
    
-    items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink', 'ProductImg'])
+    items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink'])
     pagelinks = fetchallpagelinks(category_link)
    # print(pagelinks)
+    # print("\n\n\n")
     it =1;
     
     for link in pagelinks:
@@ -78,19 +79,17 @@ def fetchdatafromcategory(category_link, category):
             if isinstance(ele, NavigableString):
                 continue
             else :
-                ProductImageLink = ele.find(class_ = "ProductImage QuickView")
-                imgsrc = ProductImageLink.find('img')["src"]
                 ProductPriceRating = ele.find(class_ = "ProductPriceRating")
                 ProductDetails = ele.find(class_ = "ProductDetails")
                 itemlink = ele.find('a')['href']
-                items.loc[it] = [category, category_link, ProductDetails.get_text().strip(), ProductPriceRating.get_text().strip(), itemlink,imgsrc  ] 
+                items.loc[it] = [category, category_link, ProductDetails.get_text().strip(), ProductPriceRating.get_text().strip(), itemlink ] 
                 it = it+1
     return items
     
     
     
 def fetchallitemsfromcategories(category_frame):
-   items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink', 'ProductImg'])
+   items = pd.DataFrame(columns=['category', 'category_link', 'ProductDetails', 'ProductPriceRating', 'Productlink'])
    for index, row in category_frame.iterrows():
         category_link = row['link']
         
@@ -103,18 +102,25 @@ def fetchallitemsfromcategories(category_frame):
 
     
 ###########_____Driver Code______############## 
-#output file name
-filename = inspect.getframeinfo(inspect.currentframe()).filename
-path = os.path.dirname(os.path.abspath(filename))
-file_name = path + "/pbdata.csv"
-page = requests.get("http://store.patelbros.com/")
-soup = BeautifulSoup(page.content, 'html.parser')
-# scrapping categories
-category_frame = findcategorylist(soup)
-finalitems = fetchallitemsfromcategories(category_frame)
-#finalitems.dtypes
-finalitems.to_csv(file_name, sep=',', encoding='utf-8', index=False)
-for p in finalitems: print p
+def writeOutput(): 
+   #output file name
+   filename = inspect.getframeinfo(inspect.currentframe()).filename
+   path = os.path.dirname(os.path.abspath(filename))
+   file_name = path + "/pbdata.json"
+   page = requests.get("http://store.patelbros.com/")
+   soup = BeautifulSoup(page.content, 'html.parser')
+   # scrapping categories
+   category_frame = findcategorylist(soup)
+   finalitems = fetchallitemsfromcategories(category_frame)
+   #finalitems.dtypes
+   #finalitems.to_csv(file_name, sep=',', encoding='utf-8', index=False)
+   finalitems.to_json(file_name,orient='index')
+   mystr = finalitems.to_json(orient='index')
+   return mystr
+   #for p in finalitems: print p
+
+
+
 
 
 #getcategorydetails(categorybarcontent)
@@ -141,12 +147,3 @@ for p in finalitems: print p
 #categorybar = list(left.children)[1]
 #categorybarcontent = list((list(categorybar.children)[3]).children)[1]
 #categorybarcontent
-#page3 = requests.get("http://store.patelbros.com/beverages/")
-#soup2 = BeautifulSoup(page3.content, 'html.parser')
-#pagecontent = soup2.find(id="CategoryContent")
-#  product_list = pagecontent.find('ul')
-#print(product_list)
-#ProductImageLink = product_list.find(class_ = "ProductImage QuickView")
-#print(ProductImageLink)
-#link = ProductImageLink.find('img')["src"]
-#print(link)
