@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.RecyclerView;
@@ -199,7 +200,8 @@ public class RvProspectOrderAdapter extends RecyclerView.Adapter<RvProspectOrder
         }
         amountReached.setText(String.valueOf(amtReached));
         float remainder = order.getTargetTotal() - amtReached;
-        if (remainder < 0) remainder = 0;
+        if (remainder <= 0) remainder = 0;
+        else amountReached.setTextColor(Color.RED);
         remainingAmount.setText(String.valueOf(remainder));
     }
 

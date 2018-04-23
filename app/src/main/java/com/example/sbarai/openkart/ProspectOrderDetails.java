@@ -2,6 +2,7 @@ package com.example.sbarai.openkart;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.support.design.widget.BottomSheetBehavior;
@@ -166,7 +167,8 @@ public class ProspectOrderDetails extends AppCompatActivity {
         DecimalFormat df = new DecimalFormat("###.##");
         amountReached.setText(String.valueOf(df.format(amtReached)));
         float remainder = order.getTargetTotal() - amtReached;
-        if (remainder < 0) remainder = 0;
+        if (remainder <= 0) remainder = 0;
+        else amountReached.setTextColor(Color.RED);
         remainingAmount.setText(String.valueOf(df.format(remainder)));
         totalCollaborators.setText(String.valueOf(totalColaboratorsCount) + " Collaborators");
         totalItems.setText(String.valueOf(totalItemsCount) + " Total items");
