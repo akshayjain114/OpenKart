@@ -6,6 +6,7 @@ import android.widget.ImageView;
 
 import com.example.sbarai.openkart.Models.CatalogueItem;
 import com.example.sbarai.openkart.OpenOrderAddItem;
+import com.example.sbarai.openkart.R;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -17,17 +18,7 @@ import android.os.AsyncTask;
  */
 
 public abstract class AddItemImageRetrieverActivity extends AsyncTask<String, Void,Bitmap>{
-    protected Object doInBackground(CatalogueItem item, ImageView ivItemImg) {
-        URL url = null;
-        try {
-            url = new URL(item.getProductImg());
-            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            ivItemImg.setImageBitmap(bmp);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    protected Bitmap doInBackground(String... strings) {
         return null;
     }
 }
