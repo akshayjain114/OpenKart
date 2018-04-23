@@ -17,7 +17,7 @@ public class NotificationHelper {
 
     final static String apiKey = "AAAApNg8CD8:APA91bGeCvAZK3ENgOBwSnuNaaqCm60rkyeNKv6a0hNvAOzC9fM8VdOfy2xW0i3Maq2ntSkyW-4tsnEu40TRiyxFzexgZM4UPKaz_4ukyOhqDO-G3nF31ybJuqs22NVK-FawNJigC5SI";
 
-    public static void sendNotification(String title, String body, String deviceToken){
+    public static void sendNotification(String title, String body, String topicId){
 
         URL url = null;
         try {
@@ -28,7 +28,7 @@ public class NotificationHelper {
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Authorization", "key=" + apiKey);
             conn.setDoOutput(true);
-            JSONObject message = buildNotification(title, body, deviceToken);
+            JSONObject message = buildNotification(title, body, topicId);
 
             OutputStream os = conn.getOutputStream();
             os.write(message.toString().getBytes());
@@ -40,13 +40,12 @@ public class NotificationHelper {
             e.printStackTrace();
             Log.e("Exception", e.toString());
         }
-
     }
 
-    public static JSONObject buildNotification(String title, String body, String deviceToken){
+    public static JSONObject buildNotification(String title, String body, String topicId){
         JSONObject message = new JSONObject();
         try {
-            message.put("to", deviceToken);
+            message.put("to", "/topics/"+topicId);
             message.put("priority", "high");
 
             JSONObject notification = new JSONObject();
