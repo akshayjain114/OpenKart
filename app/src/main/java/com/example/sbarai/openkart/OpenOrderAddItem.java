@@ -1,6 +1,9 @@
 package com.example.sbarai.openkart;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ProcessLifecycleOwnerInitializer;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.renderscript.Sampler;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.sbarai.openkart.Models.CatalogueItem;
@@ -18,6 +22,7 @@ import com.example.sbarai.openkart.Models.CollaborationItem;
 import com.example.sbarai.openkart.Models.Collaborator;
 import com.example.sbarai.openkart.Models.Item;
 import com.example.sbarai.openkart.Models.ProspectOrder;
+import com.example.sbarai.openkart.Utils.AddItemImageRetrieverActivity;
 import com.example.sbarai.openkart.Utils.FirebaseManager;
 import com.example.sbarai.openkart.Utils.NotificationHelper;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,8 +34,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,6 +79,7 @@ public class OpenOrderAddItem extends AppCompatActivity {
             atItemName = (AutoCompleteTextView) findViewById(R.id.item_name);
             final EditText etItemLink = findViewById(R.id.itemLink);
             etItemLink.setEnabled(false);
+            final ImageView ivItemImg = findViewById(R.id.product_image);
             final EditText etItemRate = findViewById(R.id.itemRate);
             etItemRate.setEnabled(false);
             ref.addValueEventListener(new ValueEventListener() {
@@ -116,8 +124,32 @@ public class OpenOrderAddItem extends AppCompatActivity {
                                     //etItemName1.setText(sugg.getName());
 
                                     etItemLink.setText(sugg.getProductlink());
-
                                     etItemRate.setText(sugg.getProductPriceRating());
+                                    @SuppressLint("StaticFieldLeak")
+                                    AddItemImageRetrieverActivity imgrt = new AddItemImageRetrieverActivity() {
+                                        @Override
+                                        protected Bitmap doInBackground(String... strings) {
+                                            URL url = null;
+                                            try {
+                                                url = new URL(strings[0]);
+                                                final Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                                runOnUiThread(new Runnable() {
+
+                                                    @Override
+                                                    public void run() {
+                                                        ivItemImg.setImageBitmap(bmp);
+                                                        ivItemImg.getLayoutParams().height = 750;
+                                                        ivItemImg.requestLayout();
+                                                    }
+                                                });
+                                                return bmp;
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                            return null;
+                                        }
+                                    };
+                                    imgrt.execute(sugg.getProductImg());
 
                                 }
 

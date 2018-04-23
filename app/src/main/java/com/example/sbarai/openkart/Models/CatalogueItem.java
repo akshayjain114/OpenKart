@@ -11,6 +11,16 @@ public class CatalogueItem {
     private String category;
     private String category_link;
 
+    public String getProductImg() {
+        return ProductImg;
+    }
+
+    public void setProductImg(String productImg) {
+        ProductImg = productImg;
+    }
+
+    private String ProductImg;
+
     public String getProductDetails() {
         return ProductDetails;
     }
