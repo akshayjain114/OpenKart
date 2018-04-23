@@ -43,6 +43,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
     View addItem;
     LayoutInflater inflater;
     LinearLayout listOfItems;
+    Boolean smart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +88,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
                                 openMapsToALocation(order.getLocation());
                             }
                         });
+                        smart=order.isSmart();
                     }
 
                     @Override
@@ -288,6 +290,7 @@ public class ProspectOrderDetails extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(ProspectOrderDetails.this,OpenOrderAddItem.class);
                 intent.putExtra("POid",POid);
+                intent.putExtra("smart",smart);
                 startActivity(intent);
             }
         });
