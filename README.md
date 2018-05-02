@@ -12,3 +12,5 @@ Evaluation Form - http://tiny.cc/Openkart-evaluation
 March Report - http://tiny.cc/b-se18march
 
 March Talk - http://tiny.cc/b-marchTalk
+
+Link to app OpenKart 2.0 - http://tiny.cc/openkartv2
